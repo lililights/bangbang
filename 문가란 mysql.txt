@@ -1,20 +1,22 @@
+-- ----------------------------------------------------------------------------
+
 -- 주문
-ALTER TABLE `project`.`order`
+ALTER TABLE `bangbang`.`order`
 	DROP FOREIGN KEY `FK_user_TO_order`; -- 회원 -> 주문
 
 -- 주문
-ALTER TABLE `project`.`order`
+ALTER TABLE `bangbang`.`order`
 	DROP FOREIGN KEY `FK_store_TO_order`; -- 가맹점 -> 주문
 
 -- 주문
-ALTER TABLE `project`.`order`
+ALTER TABLE `bangbang`.`order`
 	DROP PRIMARY KEY; -- 주문 기본키
 
 -- 주문
-DROP TABLE IF EXISTS `project`.`order` RESTRICT;
+DROP TABLE IF EXISTS `bangbang`.`order` RESTRICT;
 
 -- 주문
-CREATE TABLE `project`.`order` (
+CREATE TABLE `bangbang`.`order` (
 	`oidx`   INT         NOT NULL COMMENT 'AI', -- 주문번호
 	`uidx`   INT         NOT NULL, -- 회원번호
 	`sidx`   INT         NOT NULL, -- 가맹점번호
@@ -26,57 +28,57 @@ CREATE TABLE `project`.`order` (
 );
 
 -- 주문
-ALTER TABLE `project`.`order`
+ALTER TABLE `bangbang`.`order`
 	ADD CONSTRAINT `PK_order` -- 주문 기본키
 		PRIMARY KEY (
 			`oidx` -- 주문번호
 		);
 
-ALTER TABLE `project`.`order`
+ALTER TABLE `bangbang`.`order`
 	MODIFY COLUMN `oidx` INT NOT NULL AUTO_INCREMENT COMMENT 'AI';
 
-ALTER TABLE `project`.`order`
+ALTER TABLE `bangbang`.`order`
 	AUTO_INCREMENT = 1;
 
 -- 주문
-ALTER TABLE `project`.`order`
+ALTER TABLE `bangbang`.`order`
 	ADD CONSTRAINT `FK_user_TO_order` -- 회원 -> 주문
 		FOREIGN KEY (
 			`uidx` -- 회원번호
 		)
-		REFERENCES `project`.`user` ( -- 회원
+		REFERENCES `bangbang`.`user` ( -- 회원
 			`uidx` -- 회원번호
 		);
 
 -- 주문
-ALTER TABLE `project`.`order`
+ALTER TABLE `bangbang`.`order`
 	ADD CONSTRAINT `FK_store_TO_order` -- 가맹점 -> 주문
 		FOREIGN KEY (
 			`sidx` -- 가맹점번호
 		)
-		REFERENCES `project`.`store` ( -- 가맹점
+		REFERENCES `bangbang`.`store` ( -- 가맹점
 			`sidx` -- 가맹점번호
 		);
 
---------------------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 
 -- 주문상품
-ALTER TABLE `project`.`order_item`
+ALTER TABLE `bangbang`.`order_item`
 	DROP FOREIGN KEY `FK_order_TO_order_item`; -- 주문 -> 주문상품
 
 -- 주문상품
-ALTER TABLE `project`.`order_item`
+ALTER TABLE `bangbang`.`order_item`
 	DROP FOREIGN KEY `FK_item_TO_order_item`; -- 상품 -> 주문상품
 
 -- 주문상품
-ALTER TABLE `project`.`order_item`
+ALTER TABLE `bangbang`.`order_item`
 	DROP PRIMARY KEY; -- 주문상품 기본키
 
 -- 주문상품
-DROP TABLE IF EXISTS `project`.`order_item` RESTRICT;
+DROP TABLE IF EXISTS `bangbang`.`order_item` RESTRICT;
 
 -- 주문상품
-CREATE TABLE `project`.`order_item` (
+CREATE TABLE `bangbang`.`order_item` (
 	`oiidx` INT     NOT NULL COMMENT 'AI', -- 장바구니번호
 	`oidx`  INT     NOT NULL, -- 주문번호
 	`iidx`  INT     NOT NULL, -- 상품번호
@@ -84,53 +86,53 @@ CREATE TABLE `project`.`order_item` (
 );
 
 -- 주문상품
-ALTER TABLE `project`.`order_item`
+ALTER TABLE `bangbang`.`order_item`
 	ADD CONSTRAINT `PK_order_item` -- 주문상품 기본키
 		PRIMARY KEY (
 			`oiidx` -- 장바구니번호
 		);
 
-ALTER TABLE `project`.`order_item`
+ALTER TABLE `bangbang`.`order_item`
 	MODIFY COLUMN `oiidx` INT NOT NULL AUTO_INCREMENT COMMENT 'AI';
 
-ALTER TABLE `project`.`order_item`
+ALTER TABLE `bangbang`.`order_item`
 	AUTO_INCREMENT = 1;
 
 -- 주문상품
-ALTER TABLE `project`.`order_item`
+ALTER TABLE `bangbang`.`order_item`
 	ADD CONSTRAINT `FK_order_TO_order_item` -- 주문 -> 주문상품
 		FOREIGN KEY (
 			`oidx` -- 주문번호
 		)
-		REFERENCES `project`.`order` ( -- 주문
+		REFERENCES `bangbang`.`order` ( -- 주문
 			`oidx` -- 주문번호
 		);
 
 -- 주문상품
-ALTER TABLE `project`.`order_item`
+ALTER TABLE `bangbang`.`order_item`
 	ADD CONSTRAINT `FK_item_TO_order_item` -- 상품 -> 주문상품
 		FOREIGN KEY (
 			`iidx` -- 상품번호
 		)
-		REFERENCES `project`.`item` ( -- 상품
+		REFERENCES `bangbang`.`item` ( -- 상품
 			`iidx` -- 상품번호
 		);
 
---------------------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 
 -- 배송
-ALTER TABLE `project`.`delivery`
+ALTER TABLE `bangbang`.`delivery`
 	DROP FOREIGN KEY `FK_order_TO_delivery`; -- 주문 -> 배송
 
 -- 배송
-ALTER TABLE `project`.`delivery`
+ALTER TABLE `bangbang`.`delivery`
 	DROP PRIMARY KEY; -- 배송 기본키
 
 -- 배송
-DROP TABLE IF EXISTS `project`.`delivery` RESTRICT;
+DROP TABLE IF EXISTS `bangbang`.`delivery` RESTRICT;
 
 -- 배송
-CREATE TABLE `project`.`delivery` (
+CREATE TABLE `bangbang`.`delivery` (
 	`didx`     INT         NOT NULL COMMENT 'AI', -- 배송번호
 	`oidx`     INT         NOT NULL, -- 주문번호
 	`service`  VARCHAR(20) NOT NULL, -- 배송수단
@@ -140,47 +142,47 @@ CREATE TABLE `project`.`delivery` (
 );
 
 -- 배송
-ALTER TABLE `project`.`delivery`
+ALTER TABLE `bangbang`.`delivery`
 	ADD CONSTRAINT `PK_delivery` -- 배송 기본키
 		PRIMARY KEY (
 			`didx` -- 배송번호
 		);
 
-ALTER TABLE `project`.`delivery`
+ALTER TABLE `bangbang`.`delivery`
 	MODIFY COLUMN `didx` INT NOT NULL AUTO_INCREMENT COMMENT 'AI';
 
-ALTER TABLE `project`.`delivery`
+ALTER TABLE `bangbang`.`delivery`
 	AUTO_INCREMENT = 1;
 
 -- 배송
-ALTER TABLE `project`.`delivery`
+ALTER TABLE `bangbang`.`delivery`
 	ADD CONSTRAINT `FK_order_TO_delivery` -- 주문 -> 배송
 		FOREIGN KEY (
 			`oidx` -- 주문번호
 		)
-		REFERENCES `project`.`order` ( -- 주문
+		REFERENCES `bangbang`.`order` ( -- 주문
 			`oidx` -- 주문번호
 		);
 
---------------------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 
 -- 결제
-ALTER TABLE `project`.`payment`
+ALTER TABLE `bangbang`.`payment`
 	DROP FOREIGN KEY `FK_order_TO_payment`; -- 주문 -> 결제
 
 -- 결제
-ALTER TABLE `project`.`payment`
+ALTER TABLE `bangbang`.`payment`
 	DROP FOREIGN KEY `FK_usercoupon_TO_payment`; -- 발급쿠폰 -> 결제
 
 -- 결제
-ALTER TABLE `project`.`payment`
+ALTER TABLE `bangbang`.`payment`
 	DROP PRIMARY KEY; -- 결제 기본키
 
 -- 결제
-DROP TABLE IF EXISTS `project`.`payment` RESTRICT;
+DROP TABLE IF EXISTS `bangbang`.`payment` RESTRICT;
 
 -- 결제
-CREATE TABLE `project`.`payment` (
+CREATE TABLE `bangbang`.`payment` (
 	`pidx`       INT         NOT NULL COMMENT 'AI', -- 결제번호
 	`oidx`       INT         NOT NULL, -- 주문번호
 	`totalprice` MEDIUMINT   UNSIGNED NOT NULL, -- 총상품금액
@@ -192,60 +194,60 @@ CREATE TABLE `project`.`payment` (
 );
 
 -- 결제
-ALTER TABLE `project`.`payment`
+ALTER TABLE `bangbang`.`payment`
 	ADD CONSTRAINT `PK_payment` -- 결제 기본키
 		PRIMARY KEY (
 			`pidx` -- 결제번호
 		);
 
-ALTER TABLE `project`.`payment`
+ALTER TABLE `bangbang`.`payment`
 	MODIFY COLUMN `pidx` INT NOT NULL AUTO_INCREMENT COMMENT 'AI';
 
-ALTER TABLE `project`.`payment`
+ALTER TABLE `bangbang`.`payment`
 	AUTO_INCREMENT = 1;
 
 -- 결제
-ALTER TABLE `project`.`payment`
+ALTER TABLE `bangbang`.`payment`
 	ADD CONSTRAINT `FK_order_TO_payment` -- 주문 -> 결제
 		FOREIGN KEY (
 			`oidx` -- 주문번호
 		)
-		REFERENCES `project`.`order` ( -- 주문
+		REFERENCES `bangbang`.`order` ( -- 주문
 			`oidx` -- 주문번호
 		);
 
 -- 결제
-ALTER TABLE `project`.`payment`
+ALTER TABLE `bangbang`.`payment`
 	ADD CONSTRAINT `FK_usercoupon_TO_payment` -- 발급쿠폰 -> 결제
 		FOREIGN KEY (
 			`ucidx` -- 쿠폰발급번호
 		)
-		REFERENCES `project`.`usercoupon` ( -- 발급쿠폰
+		REFERENCES `bangbang`.`usercoupon` ( -- 발급쿠폰
 			`ucidx` -- 쿠폰발급번호
 		);
         
-ALTER TABLE `project`.`payment` 
+ALTER TABLE `bangbang`.`payment` 
 ADD COLUMN `discount` MEDIUMINT NULL DEFAULT 0 AFTER `totalprice`;
 
---------------------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 
 -- 적립
-ALTER TABLE `project`.`point`
+ALTER TABLE `bangbang`.`point`
 	DROP FOREIGN KEY `FK_user_TO_point`; -- 회원 -> 적립
 
 -- 적립
-ALTER TABLE `project`.`point`
+ALTER TABLE `bangbang`.`point`
 	DROP FOREIGN KEY `FK_payment_TO_point`; -- 결제 -> 적립
 
 -- 적립
-ALTER TABLE `project`.`point`
+ALTER TABLE `bangbang`.`point`
 	DROP PRIMARY KEY; -- 적립 기본키
 
 -- 적립
-DROP TABLE IF EXISTS `project`.`point` RESTRICT;
+DROP TABLE IF EXISTS `bangbang`.`point` RESTRICT;
 
 -- 적립
-CREATE TABLE `project`.`point` (
+CREATE TABLE `bangbang`.`point` (
 	`poidx`   INT       NOT NULL COMMENT 'AI', -- 적립번호
 	`uidx`    INT       NOT NULL, -- 회원번호
 	`pidx`    INT       NOT NULL, -- 결제번호
@@ -255,36 +257,36 @@ CREATE TABLE `project`.`point` (
 );
 
 -- 적립
-ALTER TABLE `project`.`point`
+ALTER TABLE `bangbang`.`point`
 	ADD CONSTRAINT `PK_point` -- 적립 기본키
 		PRIMARY KEY (
 			`poidx` -- 적립번호
 		);
 
-ALTER TABLE `project`.`point`
+ALTER TABLE `bangbang`.`point`
 	MODIFY COLUMN `poidx` INT NOT NULL AUTO_INCREMENT COMMENT 'AI';
 
-ALTER TABLE `project`.`point`
+ALTER TABLE `bangbang`.`point`
 	AUTO_INCREMENT = 1;
 
 -- 적립
-ALTER TABLE `project`.`point`
+ALTER TABLE `bangbang`.`point`
 	ADD CONSTRAINT `FK_user_TO_point` -- 회원 -> 적립
 		FOREIGN KEY (
 			`uidx` -- 회원번호
 		)
-		REFERENCES `project`.`user` ( -- 회원
+		REFERENCES `bangbang`.`user` ( -- 회원
 			`uidx` -- 회원번호
 		);
 
 -- 적립
-ALTER TABLE `project`.`point`
+ALTER TABLE `bangbang`.`point`
 	ADD CONSTRAINT `FK_payment_TO_point` -- 결제 -> 적립
 		FOREIGN KEY (
 			`pidx` -- 결제번호
 		)
-		REFERENCES `project`.`payment` ( -- 결제
+		REFERENCES `bangbang`.`payment` ( -- 결제
 			`pidx` -- 결제번호
 		);
         
---------------------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
