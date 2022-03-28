@@ -1,0 +1,98 @@
+-- ----------------------------------------------------------------------------
+
+-- 주문 상품 추가 -> 상품 재고 차감 trigger
+
+drop trigger if exists trig_item_sold;
+delimiter $$
+create trigger trig_item_sold after insert on bangbang.order_item for each row
+begin
+	update bangbang.item set qty=(qty-NEW.qty) where iidx=NEW.iidx;
+end $$
+delimiter ;
+
+-- ----------------------------------------------------------------------------
+
+-- 주문 취소완료/반품완료 -> 상품 재고 복구 trigger
+
+drop trigger if exists trig_item_cancel;
+delimiter $$
+create trigger trig_item_cancel after update on bangbang.order for each row
+begin
+if NEW.status in('취소완료', '반품완료')
+then begin
+	update bangbang.item set qty=(qty+(select qty from bangbang.order_item where oidx=NEW.oidx)) where iidx=(select iidx from bangbang.order_item where oidx=NEW.oidx);
+    end;
+    end if;
+end $$
+delimiter ;
+
+-- ----------------------------------------------------------------------------
+
+-- 택배요청 -> 주문단계 '배송진행중' trigger
+
+drop trigger if exists trig_start_deliver;
+delimiter $$
+create trigger trig_start_deliver after insert on bangbang.delivery for each row
+begin
+	update bangbang.order set status='배송진행중' where oidx=NEW.oidx;
+end $$
+delimiter ;
+
+-- ----------------------------------------------------------------------------
+
+-- 회원의 최종 적립금액 구하기 function
+
+drop function if exists func_user_point;
+delimiter $$
+create function func_user_point(useridx int) returns mediumint
+begin
+	declare point_balance mediumint;
+    set point_balance = (select balance from bangbang.point where uidx=useridx and date = (select max(date) from bangbang.point where uidx=useridx));
+    if point_balance is null
+		then begin
+			set point_balance = 0;
+		end;
+    end if;
+    return point_balance;
+end $$
+delimiter ;
+
+-- ----------------------------------------------------------------------------
+
+-- 결제 추가 -> 적립금 사용 trigger
+
+drop trigger if exists trig_point_use;
+delimiter $$
+create trigger trig_point_use after insert on bangbang.payment for each row
+begin
+	declare user_idx int;
+    set user_idx = (select o.uidx from bangbang.order o join bangbang.payment p on o.oidx=p.oidx where p.oidx=NEW.oidx);
+if NEW.pointused != 0
+then begin
+	insert into bangbang.point (uidx, pidx, changes, balance) values (user_idx, NEW.pidx, NEW.pointused, func_user_point(user_idx) + NEW.pointused);
+    end;
+    end if;
+end $$
+delimiter ;
+
+-- ----------------------------------------------------------------------------
+
+-- 배송완료 -> 적립금 적립 trigger
+
+drop trigger if exists trig_add_point;
+delimiter $$
+create trigger trig_add_point after update on bangbang.order for each row
+begin
+	declare payment_idx int;
+    declare add_point mediumint;
+    set payment_idx = (select p.pidx from bangbang.payment p join bangbang.order o on p.oidx=o.oidx where p.oidx=NEW.oidx);
+    set add_point = (select truncate((totalpay * 0.03), 0) from bangbang.payment where pidx=payment_idx);
+if NEW.status = '픽업완료'
+then begin
+	insert into bangbang.point (uidx, pidx, changes, balance) values (NEW.uidx, payment_idx, add_point, func_user_point(NEW.uidx) + add_point);
+    end;
+    end if;
+end $$
+delimiter ;
+
+-- ----------------------------------------------------------------------------

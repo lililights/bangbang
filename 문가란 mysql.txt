@@ -1,0 +1,290 @@
+-- 주문
+ALTER TABLE `project`.`order`
+	DROP FOREIGN KEY `FK_user_TO_order`; -- 회원 -> 주문
+
+-- 주문
+ALTER TABLE `project`.`order`
+	DROP FOREIGN KEY `FK_store_TO_order`; -- 가맹점 -> 주문
+
+-- 주문
+ALTER TABLE `project`.`order`
+	DROP PRIMARY KEY; -- 주문 기본키
+
+-- 주문
+DROP TABLE IF EXISTS `project`.`order` RESTRICT;
+
+-- 주문
+CREATE TABLE `project`.`order` (
+	`oidx`   INT         NOT NULL COMMENT 'AI', -- 주문번호
+	`uidx`   INT         NOT NULL, -- 회원번호
+	`sidx`   INT         NOT NULL, -- 가맹점번호
+	`name`   VARCHAR(25) NOT NULL, -- 주문자명
+	`phone`  VARCHAR(30) NOT NULL, -- 연락처
+	`msg`    VARCHAR(30) NULL,     -- 배송메세지
+	`date`   TIMESTAMP   NOT NULL DEFAULT current_timestamp COMMENT 'sysdate', -- 주문일시
+	`status` VARCHAR(20) NOT NULL DEFAULT '주문완료' COMMENT 'default' -- 주문현황
+);
+
+-- 주문
+ALTER TABLE `project`.`order`
+	ADD CONSTRAINT `PK_order` -- 주문 기본키
+		PRIMARY KEY (
+			`oidx` -- 주문번호
+		);
+
+ALTER TABLE `project`.`order`
+	MODIFY COLUMN `oidx` INT NOT NULL AUTO_INCREMENT COMMENT 'AI';
+
+ALTER TABLE `project`.`order`
+	AUTO_INCREMENT = 1;
+
+-- 주문
+ALTER TABLE `project`.`order`
+	ADD CONSTRAINT `FK_user_TO_order` -- 회원 -> 주문
+		FOREIGN KEY (
+			`uidx` -- 회원번호
+		)
+		REFERENCES `project`.`user` ( -- 회원
+			`uidx` -- 회원번호
+		);
+
+-- 주문
+ALTER TABLE `project`.`order`
+	ADD CONSTRAINT `FK_store_TO_order` -- 가맹점 -> 주문
+		FOREIGN KEY (
+			`sidx` -- 가맹점번호
+		)
+		REFERENCES `project`.`store` ( -- 가맹점
+			`sidx` -- 가맹점번호
+		);
+
+--------------------------------------------------------------------------------------
+
+-- 주문상품
+ALTER TABLE `project`.`order_item`
+	DROP FOREIGN KEY `FK_order_TO_order_item`; -- 주문 -> 주문상품
+
+-- 주문상품
+ALTER TABLE `project`.`order_item`
+	DROP FOREIGN KEY `FK_item_TO_order_item`; -- 상품 -> 주문상품
+
+-- 주문상품
+ALTER TABLE `project`.`order_item`
+	DROP PRIMARY KEY; -- 주문상품 기본키
+
+-- 주문상품
+DROP TABLE IF EXISTS `project`.`order_item` RESTRICT;
+
+-- 주문상품
+CREATE TABLE `project`.`order_item` (
+	`oiidx` INT     NOT NULL COMMENT 'AI', -- 장바구니번호
+	`oidx`  INT     NOT NULL, -- 주문번호
+	`iidx`  INT     NOT NULL, -- 상품번호
+	`qty`   TINYINT NOT NULL -- 상품개수
+);
+
+-- 주문상품
+ALTER TABLE `project`.`order_item`
+	ADD CONSTRAINT `PK_order_item` -- 주문상품 기본키
+		PRIMARY KEY (
+			`oiidx` -- 장바구니번호
+		);
+
+ALTER TABLE `project`.`order_item`
+	MODIFY COLUMN `oiidx` INT NOT NULL AUTO_INCREMENT COMMENT 'AI';
+
+ALTER TABLE `project`.`order_item`
+	AUTO_INCREMENT = 1;
+
+-- 주문상품
+ALTER TABLE `project`.`order_item`
+	ADD CONSTRAINT `FK_order_TO_order_item` -- 주문 -> 주문상품
+		FOREIGN KEY (
+			`oidx` -- 주문번호
+		)
+		REFERENCES `project`.`order` ( -- 주문
+			`oidx` -- 주문번호
+		);
+
+-- 주문상품
+ALTER TABLE `project`.`order_item`
+	ADD CONSTRAINT `FK_item_TO_order_item` -- 상품 -> 주문상품
+		FOREIGN KEY (
+			`iidx` -- 상품번호
+		)
+		REFERENCES `project`.`item` ( -- 상품
+			`iidx` -- 상품번호
+		);
+
+--------------------------------------------------------------------------------------
+
+-- 배송
+ALTER TABLE `project`.`delivery`
+	DROP FOREIGN KEY `FK_order_TO_delivery`; -- 주문 -> 배송
+
+-- 배송
+ALTER TABLE `project`.`delivery`
+	DROP PRIMARY KEY; -- 배송 기본키
+
+-- 배송
+DROP TABLE IF EXISTS `project`.`delivery` RESTRICT;
+
+-- 배송
+CREATE TABLE `project`.`delivery` (
+	`didx`     INT         NOT NULL COMMENT 'AI', -- 배송번호
+	`oidx`     INT         NOT NULL, -- 주문번호
+	`service`  VARCHAR(20) NOT NULL, -- 배송수단
+	`provider` VARCHAR(25) NOT NULL, -- 업체명
+	`no`       VARCHAR(30) NOT NULL, -- 송장및접수번호
+	`fee`      SMALLINT    UNSIGNED NOT NULL  -- 운송료
+);
+
+-- 배송
+ALTER TABLE `project`.`delivery`
+	ADD CONSTRAINT `PK_delivery` -- 배송 기본키
+		PRIMARY KEY (
+			`didx` -- 배송번호
+		);
+
+ALTER TABLE `project`.`delivery`
+	MODIFY COLUMN `didx` INT NOT NULL AUTO_INCREMENT COMMENT 'AI';
+
+ALTER TABLE `project`.`delivery`
+	AUTO_INCREMENT = 1;
+
+-- 배송
+ALTER TABLE `project`.`delivery`
+	ADD CONSTRAINT `FK_order_TO_delivery` -- 주문 -> 배송
+		FOREIGN KEY (
+			`oidx` -- 주문번호
+		)
+		REFERENCES `project`.`order` ( -- 주문
+			`oidx` -- 주문번호
+		);
+
+--------------------------------------------------------------------------------------
+
+-- 결제
+ALTER TABLE `project`.`payment`
+	DROP FOREIGN KEY `FK_order_TO_payment`; -- 주문 -> 결제
+
+-- 결제
+ALTER TABLE `project`.`payment`
+	DROP FOREIGN KEY `FK_usercoupon_TO_payment`; -- 발급쿠폰 -> 결제
+
+-- 결제
+ALTER TABLE `project`.`payment`
+	DROP PRIMARY KEY; -- 결제 기본키
+
+-- 결제
+DROP TABLE IF EXISTS `project`.`payment` RESTRICT;
+
+-- 결제
+CREATE TABLE `project`.`payment` (
+	`pidx`       INT         NOT NULL COMMENT 'AI', -- 결제번호
+	`oidx`       INT         NOT NULL, -- 주문번호
+	`totalprice` MEDIUMINT   UNSIGNED NOT NULL, -- 총상품금액
+	`pointused`  MEDIUMINT   NULL,     -- 사용적립금
+	`totalpay`   MEDIUMINT   UNSIGNED NOT NULL, -- 결제금액
+	`method`     VARCHAR(20) NOT NULL, -- 결제수단
+	`status`     VARCHAR(20) NOT NULL DEFAULT '결제완료' COMMENT 'default', -- 결제상태
+	`ucidx`      INT         NULL      -- 쿠폰발급번호
+);
+
+-- 결제
+ALTER TABLE `project`.`payment`
+	ADD CONSTRAINT `PK_payment` -- 결제 기본키
+		PRIMARY KEY (
+			`pidx` -- 결제번호
+		);
+
+ALTER TABLE `project`.`payment`
+	MODIFY COLUMN `pidx` INT NOT NULL AUTO_INCREMENT COMMENT 'AI';
+
+ALTER TABLE `project`.`payment`
+	AUTO_INCREMENT = 1;
+
+-- 결제
+ALTER TABLE `project`.`payment`
+	ADD CONSTRAINT `FK_order_TO_payment` -- 주문 -> 결제
+		FOREIGN KEY (
+			`oidx` -- 주문번호
+		)
+		REFERENCES `project`.`order` ( -- 주문
+			`oidx` -- 주문번호
+		);
+
+-- 결제
+ALTER TABLE `project`.`payment`
+	ADD CONSTRAINT `FK_usercoupon_TO_payment` -- 발급쿠폰 -> 결제
+		FOREIGN KEY (
+			`ucidx` -- 쿠폰발급번호
+		)
+		REFERENCES `project`.`usercoupon` ( -- 발급쿠폰
+			`ucidx` -- 쿠폰발급번호
+		);
+        
+ALTER TABLE `project`.`payment` 
+ADD COLUMN `discount` MEDIUMINT NULL DEFAULT 0 AFTER `totalprice`;
+
+--------------------------------------------------------------------------------------
+
+-- 적립
+ALTER TABLE `project`.`point`
+	DROP FOREIGN KEY `FK_user_TO_point`; -- 회원 -> 적립
+
+-- 적립
+ALTER TABLE `project`.`point`
+	DROP FOREIGN KEY `FK_payment_TO_point`; -- 결제 -> 적립
+
+-- 적립
+ALTER TABLE `project`.`point`
+	DROP PRIMARY KEY; -- 적립 기본키
+
+-- 적립
+DROP TABLE IF EXISTS `project`.`point` RESTRICT;
+
+-- 적립
+CREATE TABLE `project`.`point` (
+	`poidx`   INT       NOT NULL COMMENT 'AI', -- 적립번호
+	`uidx`    INT       NOT NULL, -- 회원번호
+	`pidx`    INT       NOT NULL, -- 결제번호
+	`changes`  MEDIUMINT NOT NULL COMMENT '+/-', -- 거래적립금
+	`balance` MEDIUMINT UNSIGNED NOT NULL, -- 잔여적립금
+	`date`    TIMESTAMP NOT NULL DEFAULT current_timestamp COMMENT 'sysdate' -- 적용일시
+);
+
+-- 적립
+ALTER TABLE `project`.`point`
+	ADD CONSTRAINT `PK_point` -- 적립 기본키
+		PRIMARY KEY (
+			`poidx` -- 적립번호
+		);
+
+ALTER TABLE `project`.`point`
+	MODIFY COLUMN `poidx` INT NOT NULL AUTO_INCREMENT COMMENT 'AI';
+
+ALTER TABLE `project`.`point`
+	AUTO_INCREMENT = 1;
+
+-- 적립
+ALTER TABLE `project`.`point`
+	ADD CONSTRAINT `FK_user_TO_point` -- 회원 -> 적립
+		FOREIGN KEY (
+			`uidx` -- 회원번호
+		)
+		REFERENCES `project`.`user` ( -- 회원
+			`uidx` -- 회원번호
+		);
+
+-- 적립
+ALTER TABLE `project`.`point`
+	ADD CONSTRAINT `FK_payment_TO_point` -- 결제 -> 적립
+		FOREIGN KEY (
+			`pidx` -- 결제번호
+		)
+		REFERENCES `project`.`payment` ( -- 결제
+			`pidx` -- 결제번호
+		);
+        
+--------------------------------------------------------------------------------------
