@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bitwin.bangbang.admin.dao.ItemDAO">
+
+	<insert id="create">
+			
+		INSERT INTO item (name, ename, ml, proof, location, type, taste, scent, oprice, sprice, discount, qty, etc)
+ 	 VALUES (#{name},#{ename},#{ml},#{proof},#{location},#{type},#{taste},#{scent},#{oprice},#{sprice},#{discount},#{qty},#{etc})
+	</insert>
+	
+	<select id="read" resultType="com.bitwin.bangbang.admin.domain.ItemRead">
+		select * from item where iidx = #{iidx}
+	</select>
+	
+	<select id="selectTotalCount"
+			parameterType="hashMap"
+			resultType="int">
+									
+			select count(*) from item
+			<where>
+				<if test="searchType != null"> 
+					<if test="searchType == 'name'">
+						<include refid="searchName"/>
+					</if>
+					<if test="searchType == 'ename'">
+						<include refid="searchEname"/>
+					</if>
+				</if>
+			</where>
+	</select>
+	
+	<sql id="searchName"> 
+		or name like concat('%', #{keyword}, '%')
+	</sql>
+	
+	<sql id="searchEname">
+		or ename like concat('%', #{keyword}, '%')
+	</sql>
+	
+	<select id="selectList"
+			parameterType="com.bitwin.bangbang.admin.domain.SearchParams"
+			resultType="com.bitwin.bangbang.admin.domain.Item">
+	
+	select * from item
+	
+	<where>
+		<if test="searchType != null">
+		
+			<if test="searchType == 'name'">
+				<include refid="searchName"/>
+			</if>
+			<if test="searchType == 'ename'">
+				<include refid="searchEname"/>
+			</if>
+		</if>
+	</where>
+	
+	 order by iidx desc limit #{index}, #{count}
+	
+	</select>
+	
+	
+	
+	
+	<delete id="delete">
+		delete from item where iidx=#{iidx}
+	</delete>
+	
+	<update id="update"
+			parameterType="com.bitwin.bangbang.admin.domain.Item">
+	
+		update item
+		set 
+		name=#{name},
+		ename=#{ename},
+		ml=#{ml},
+		proof=#{proof},
+		location=#{location},
+		type=#{type},
+		taste=#{taste},
+		scent=#{scent},
+		oprice=#{oprice},
+		sprice=#{sprice},
+		discount=#{discount},
+		qty=#{qty},
+		etc=#{etc}
+		where iidx=#{iidx}
+	
+	</update>
+	
+	<select id="orderItemInfo" resultType="com.bitwin.bangbang.admin.domain.OrderItemInfo">
+		select name, sprice, discount from item where iidx = #{iidx}
+	</select>
+	
+</mapper>

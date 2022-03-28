@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bitwin.mapper.faqMapper">
+
+	<select id="getList"
+		resultType="com.bitwin.domain.faqVO">
+	
+	<![CDATA[ 
+	select * from faq where fqidx > 0
+	]]>
+
+	</select>
+
+	<insert id="insert">
+		insert into faq
+		(title,content, regdate, updatedate) values (#{title}, #{content},
+		current_timestamp(), current_timestamp())
+	</insert>
+
+	<insert id="insertSelectKey">
+
+
+		insert into faq (title,content,
+		regdate, updatedate)
+		values (#{title}, #{content}, current_timestamp(),
+		current_timestamp())
+	</insert>
+
+
+	<select id="read" resultType="com.bitwin.domain.faqVO">
+		select * from faq
+		where fqidx = #{fqidx}
+	</select>
+
+	<delete id="delete">
+		delete from faq where fqidx = #{fqidx}
+	</delete>
+
+	<update id="update">
+		update faq
+		set title = #{title},
+		content = #{content},
+		updatedate = current_timestamp()
+		where fqidx =
+		#{fqidx}
+	</update>
+
+
+
+
+
+
+
+
+	<select id="getListWithPaging"
+		resultType="com.bitwin.domain.faqVO">
+ 					 <![CDATA[  
+ 					 SELECT fqidx, title, content, regdate,updatedate
+  					FROM faq
+ 					 where 
+ 				 ]]>
+		<include refid="criteria"></include>
+ 					<![CDATA[
+  					fqidx > 0
+  
+ 					 order by fqidx desc, regdate desc
+  
+  					limit #{start}, #{amount}
+  					]]>
+	</select>
+
+
+
+
+	<select id="getTotalCount" resultType="int">
+		select count(*) from
+		faq where
+
+		<include refid="criteria"></include>
+
+		fqidx > 0
+	</select>
+
+
+
+	<sql id="criteria">
+		<trim prefix="(" suffix=") AND " prefixOverrides="OR">
+			<foreach item='type' collection="typeArr">
+				<trim prefix="OR">
+					<choose>
+						<when test="type == 'T'.toString()">
+							title like CONCAT('%',#{keyword},'%')
+						</when>
+						<when test="type == 'C'.toString()">
+							content like CONCAT('%',#{keyword},'%')
+						</when>
+						<when test="type == 'TC'.toString()">
+							title like CONCAT('%',#{keyword},'%') or content like CONCAT('%',#{keyword},'%')
+						</when>
+					</choose>
+				</trim>
+			</foreach>
+		</trim>
+	</sql>
+
+
+
+
+
+</mapper>

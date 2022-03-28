@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bitwin.bangbang.store.dao.StoreDao">
+
+	<!-- 가맹점 등록 -->
+	<insert id="insertStore"
+		parameterType="com.bitwin.bangbang.store.domain.StoreRegRequest"
+		useGeneratedKeys="true" keyProperty="sidx">
+		insert into store (storeid,
+		storepw, sname, sphone, address, oname, ophone, oemail, regnum ,
+		photo)
+		values
+		(#{storeId}, #{storePw}, #{sname}, #{sphone}, #{address},
+		#{oname},
+		#{ophone},#{oemail}, #{regnum}, #{photo})
+	</insert>
+
+	<!-- 가맹점 정보 수정 요청 -->
+	<insert id="storeInfoEditRequest"
+		parameterType="com.bitwin.bangbang.store.domain.StoreEditRequest"
+		useGeneratedKeys="true" keyProperty="sridx"
+	>
+	insert into store_req (sname, sphone, address, sidx) values (#{sname}, #{sphone}, #{address}, #{sidx})
+	</insert>
+
+	<!-- 모든 가맹점 정보 가져오기 -->
+	<select id="selectAll"
+		resultType="com.bitwin.bangbang.store.domain.Store">
+		select * from
+		store
+	</select>
+
+	<!-- 가맹점 아이디 찾기 -->
+	<select id="selectByStoreId" resultType="int">
+		select count(*)
+		from
+		store where storeid=#{storeId}
+	</select>
+
+	<!-- 로그인 : 가맹점 아이디 찾기 -->
+	<select id="selectByStoreId2"
+		resultType="com.bitwin.bangbang.store.domain.Store">
+		select * from store where storeid=#{storeId}
+	</select>
+
+	<!-- 가맹점 이름 찾기 -->
+	<select id="selectBySname"
+		resultType="com.bitwin.bangbang.store.domain.Store">
+		select * from store where sname=#{sname}
+	</select>
+	<!-- 가맹점 주문 정보 -->
+	<select id="selectOrderInfo"
+		resultType="com.bitwin.bangbang.store.domain.StoreOrderInfo">
+		select sidx,sname,sphone,address from store where
+		sidx=#{sidx}
+	</select>
+	
+	<!-- 가맹점 정보 수정 요청 정보 -->
+	<select id="selectStoreEditReq" resultType="com.bitwin.bangbang.store.domain.StoreEditRequest">
+		select * from store_req where sridx=#{sridx}
+	</select>
+	
+	<!-- 가맹점 정보 수정 요청 리스트 -->
+	<select id="selectEditRequestList"
+		resultType="com.bitwin.bangbang.store.domain.StoreEditRequestList"
+	>
+	select sridx, store.SNAME, store.STOREID from store_req inner join store on store_req.sidx = store.sidx
+	</select>
+	<!-- 가맹점 정보 수정 요청 수락 -->
+	<update id="updateStore" parameterType="com.bitwin.bangbang.store.domain.StoreEditRequest">
+		update store set sname=#{sname}, sphone=#{sphone}, address=#{address} where sidx=#{sidx}
+	</update>
+	<!-- 가맹점 비밀번호 변경 -->
+	<update id="updatePassword"
+		parameterType="com.bitwin.bangbang.store.domain.StorePassword">
+		update store set storePw=#{newPw1} where
+		storeId=#{storeId}
+	</update>
+	
+	<!-- 가맹점 정보 수정 요청 삭제 -->
+	<delete id="deleteEditReq" parameterType="int">
+		delete from store_req where sidx=#{sidx}
+	</delete>
+	
+</mapper>

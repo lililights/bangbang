@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bitwin.bangbang.order.dao.OrderDao">
+
+	<select id="getItemInfo"
+		parameterType="com.bitwin.bangbang.order.domain.CartItem"
+		resultType="com.bitwin.bangbang.order.domain.OrderItemInfo">
+		select i.iidx, sb.thumb, i.name, (i.sprice) as price, ((i.sprice) * (100 - i.discount) / 100) as salePrice 
+		from bangbang.item i join bangbang.sales_board sb 
+		on i.iidx=sb.iidx
+		where i.iidx=#{iidx}
+	</select>
+
+	<select id="getOrderReqMemberInfo"
+		resultType="com.bitwin.bangbang.order.domain.OrderReqMemberInfo">
+		select uidx, username, phonenum
+		from bangbang.user 
+		where uidx=#{uidx}
+	</select>
+
+	<select id="getMemberPoint"
+		resultType="com.bitwin.bangbang.order.domain.MemberPoint">
+		select count(poidx) as count, balance as point 
+		from bangbang.point
+		where uidx=#{uidx} and date = 
+			(select max(date) 
+			from bangbang.point
+			where uidx=#{uidx})
+	</select>
+
+	<select id="getOrderCnt" resultType="int">
+		select count(oidx) 
+		from bangbang.order 
+		where uidx=#{uidx};
+	</select>
+
+	<select id="getRecentStore" resultType="int">
+		select sidx 
+		from bangbang.order 
+		where uidx=#{uidx} and
+		date = 
+			(select max(date) 
+			from bangbang.order 
+			where uidx=#{uidx});
+	</select>
+
+	<select id="getStoreInfo"
+		resultType="com.bitwin.bangbang.order.domain.OrderReqStoreInfo">
+		select sidx, sname, sphone, address 
+		from bangbang.store
+		where sidx=#{sidx}
+	</select>
+
+	<insert id="insertOrder"
+		parameterType="com.bitwin.bangbang.order.domain.OrderRequest"
+		useGeneratedKeys="true" keyProperty="oidx">
+		insert into bangbang.order
+		<if test="msg == null">
+			(uidx, sidx, name, phone)
+			values (#{uidx}, #{sidx}, #{name}, #{phone})
+		</if>
+		<if test="msg != null">
+			(uidx, sidx, name, phone, msg)
+			values (#{uidx}, #{sidx}, #{name}, #{phone}, #{msg})
+		</if>
+	</insert>
+
+	<insert id="insertOrderItems"
+		parameterType="com.bitwin.bangbang.order.domain.OrderItem">
+		insert into bangbang.order_item
+		(oidx, iidx, qty)
+		values
+		<foreach collection='list' item='o' separator=','>
+			(#{o.oidx}, #{o.iidx}, #{o.qty})
+		</foreach>
+	</insert>
+
+	<insert id="insertPayment"
+		parameterType="com.bitwin.bangbang.order.domain.PaymentInfo">
+		insert into bangbang.payment
+		(oidx, totalprice, discount, pointused, totalpay, method)
+		values
+		(#{oidx}, #{totalprice}, #{discount}, #{pointused}, #{totalpay}, #{method})
+	</insert>
+
+	<select id="selectOrderListMember"
+		parameterType="com.bitwin.bangbang.order.domain.OrderListOptMember"
+		resultType="com.bitwin.bangbang.order.domain.OrderListMember">
+		select o.oidx, o.date, sb.thumb, i.name, (count(oi.iidx) - 1) as restCount, s.sname, o.status, p.totalpay
+		from bangbang.order o
+		join bangbang.order_item oi 
+		join bangbang.sales_board sb 
+		join bangbang.item i
+		join bangbang.store s 
+		join bangbang.payment p
+		on o.oidx=oi.oidx 
+		and oi.iidx=sb.iidx 
+		and oi.iidx=i.iidx 
+		and o.sidx=s.sidx 
+		and o.oidx=p.oidx
+		where o.uidx=#{uidx}
+		<if test="!optStatus.equals('all') and !optStatus.equals('etc')">
+			and o.status like #{optStatus}
+		</if>
+		<if test="optStatus.equals('etc')">
+			and o.status not in ('주문완료', '배송진행중', '픽업가능', '픽업완료')
+		</if>
+		<if test="optPeriod.equals('recent')">
+			and o.date >= date_add(now(), interval -30 day)
+		</if>
+		<if test="!optPeriod.equals('recent')">
+			and o.date like #{optPeriod}
+		</if>
+		group by o.oidx
+		order by date desc
+	</select>
+
+	<select id="selectOrderListStore"
+		parameterType="com.bitwin.bangbang.order.domain.OrderListOptStore"
+		resultType="com.bitwin.bangbang.order.domain.OrderListStore">
+		select o.oidx, o.date, sb.thumb, i.name, (count(oi.iidx) - 1) as restCount, 
+		u.username, o.status, p.totalpay, truncate(p.totalprice * 0.1, 0) as commission
+		from bangbang.order o 
+		join bangbang.order_item oi
+		join bangbang.sales_board sb
+		join bangbang.item i
+		join bangbang.user u 
+		join bangbang.payment p
+		on o.oidx=oi.oidx 
+		and oi.iidx=sb.iidx 
+		and oi.iidx=i.iidx 
+		and o.uidx=u.uidx
+		and o.oidx=p.oidx
+		where o.sidx=#{sidx}
+		<if test="!optStatus.equals('all') and !optStatus.equals('etc')">
+			and o.status like #{optStatus}
+		</if>
+		<if test="optStatus.equals('etc')">
+			and o.status not in ('주문완료', '배송진행중', '픽업가능', '픽업완료')
+		</if>
+		<if test="optPeriod.equals('recent')">
+			and o.date >= date_add(now(), interval -30 day)
+		</if>
+		<if test="!optPeriod.equals('recent')">
+			and o.date like #{optPeriod}
+		</if>
+		group by o.oidx
+		order by date desc
+	</select>
+
+	<select id="selectOrderListAdmin"
+		parameterType="com.bitwin.bangbang.order.domain.OrderListOptAdmin"
+		resultType="com.bitwin.bangbang.order.domain.OrderListAdmin">
+		select o.oidx, o.date, u.uidx, u.userid, s.sname, o.status
+		from bangbang.order o
+		join bangbang.user u 
+		join bangbang.store s
+		on o.uidx=u.uidx 
+		and o.sidx=s.sidx
+		where o.date like #{optPeriod}
+		<if test="!searchKeyword.equals('')">
+			<if test="searchType.equals('userid')">
+				and userid=#{searchKeyword}
+			</if>
+			<if test="searchType.equals('sname')">
+				and sname=#{searchKeyword}
+			</if>
+		</if>
+		<if test="!optStatus.equals('all') and !optStatus.equals('etc')">
+			and status like #{optStatus}
+		</if>
+		<if test="optStatus.equals('etc')">
+			and status not in ('주문완료', '배송진행중', '픽업가능', '픽업완료')
+		</if>
+		group by o.oidx
+		order by date desc
+	</select>
+
+	<select id="selectOrderItemInfo"
+		resultType="com.bitwin.bangbang.order.domain.OrderItemInfo">
+		select oi.iidx, sb.thumb, i.name, oi.qty, (i.sprice * oi.qty) as price, 
+		((i.sprice * oi.qty) * (100 - i.discount) / 100) as saleprice
+		from bangbang.order_item oi 
+		join bangbang.item i 
+		join bangbang.sales_board sb 
+		on oi.iidx=i.iidx 
+		and i.iidx=sb.iidx
+		where oi.oidx=#{oidx}
+	</select>
+
+	<select id="selectOrderInfoMember"
+		resultType="com.bitwin.bangbang.order.domain.OrderInfoMember">
+		select o.oidx, o.date, o.status, s.sname, o.name, o.phone, o.msg, p.totalPrice, p.discount, p.pointUsed, p.totalPay
+		from bangbang.order o 
+		join bangbang.store s 
+		join bangbang.payment p
+		on o.sidx=s.sidx 
+		and o.oidx=p.oidx
+		where o.oidx=#{oidx}
+	</select>
+
+	<select id="selectOrderInfoStore"
+		resultType="com.bitwin.bangbang.order.domain.OrderInfoStore">
+		select o.oidx, o.date, o.status, o.name, o.msg, truncate(p.totalPrice * 0.1, 0) as commission
+		from bangbang.order o 
+		join bangbang.payment p 
+		on o.oidx=p.oidx
+		where o.oidx=#{oidx}
+	</select>
+
+	<select id="selectOrderInfoAdmin"
+		resultType="com.bitwin.bangbang.order.domain.OrderInfoAdmin">
+		select o.oidx, o.date, o.status, u.uidx, u.userid, s.sname, o.name, o.phone, o.msg, 
+		p.totalPrice, p.discount, p.pointUsed, p.totalPay, truncate(p.totalPrice * 0.1, 0) as commission
+		from bangbang.order o 
+		join bangbang.user u 
+		join bangbang.store s 
+		join bangbang.payment p
+		on o.uidx=u.uidx 
+		and o.sidx=s.sidx 
+		and o.oidx=p.oidx
+		where o.oidx=#{oidx}
+	</select>
+
+	<select id="selectDeliveryList"
+		resultType="com.bitwin.bangbang.order.domain.DeliveryList">
+		select didx, oidx, service, provider, no, fee 
+		from bangbang.delivery 
+		natural join bangbang.order 
+		where status not in('픽업완료', '반품완료')
+	</select>
+	
+	<select id="deliveryTracking" resultType="String">
+		select d.no 
+		from bangbang.delivery d
+		join bangbang.order o
+		on d.oidx=o.oidx 
+		where d.oidx=#{oidx}
+	</select>
+
+	<update id="updateStatus"
+		parameterType="com.bitwin.bangbang.order.domain.UpdateStatus">
+		update bangbang.order 
+		set status=#{status} 
+		where oidx=#{oidx}
+	</update>
+
+	<update id="updateOrder"
+		parameterType="com.bitwin.bangbang.order.domain.UpdateOrder">
+		update bangbang.order 
+		set name=#{name}, phone=#{phone}, msg=#{msg} 
+		where oidx=#{oidx}
+	</update>
+
+	<insert id="deliveryRequest"
+		parameterType="com.bitwin.bangbang.order.domain.DeliveryRequest">
+		insert into bangbang.delivery
+		(oidx, service, provider, no, fee)
+		values
+		<foreach collection='list' item='d' separator=','>
+			(#{d.oidx}, #{d.service}, #{d.provider},
+			<if test="!d.service.equals('택배')">
+				'업체문의', 10000)
+			</if>
+			<if test="d.service.equals('택배')">
+				floor(rand()*1000000000000), 3000)
+			</if>
+		</foreach>
+	</insert>
+
+</mapper>

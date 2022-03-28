@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bitwin.bangbang.member.dao.MemberDao">
+	<!-- 회원가입 insert -->
+	<insert id="insertMember"
+		parameterType="com.bitwin.bangbang.member.domain.MemberRegRequest"
+		useGeneratedKeys="true" keyProperty="uidx">
+		insert into user (userid,
+		password, username, birth, phonenum, email, enotify, mnotify, snotify,
+		photo)
+		values (#{userid}, #{password}, #{username}, #{birth},
+		#{phonenum},
+		#{email}, #{enotify}, #{mnotify}, #{snotify},
+		#{photoName})
+	</insert>
+
+	<!-- 간편 회원가입 insert -->
+	<insert id="insertSimpleMember"
+		parameterType="com.bitwin.bangbang.member.domain.SimpleRegRequest"
+		useGeneratedKeys="true" keyProperty="uidx">
+		insert into user (userid,
+		username, birth, phonenum, email, enotify, mnotify, snotify, photo, sns)
+		values (#{userid}, #{username}, #{birth}, #{phonenum},
+		#{email},
+		#{enotify}, #{mnotify}, #{snotify}, #{photo}, #{sns})
+	</insert>
+
+	<!-- 간편 회원 이메일로 회원 정보 가져오기 -->
+	<select id="selectByEmail"
+		resultType="com.bitwin.bangbang.member.domain.LoginInfo">
+		select uidx, userId, username, photo from
+		user where
+		email=#{email}
+	</select>
+	<!-- 아이디 중복 체크 -->
+	<select id="selectCountByUesrId" resultType="int">
+		select
+		count(*) from
+		user where userid=#{userid}
+	</select>
+	<!-- 이메일 중복 체크 -->
+	<select id="selectCountByEmail" resultType="int">
+		select count(*)
+		from
+		user where email=#{email}
+	</select>
+
+	<!-- 로그인 아이디 체크 -->
+	<select id="selectById"
+		resultType="com.bitwin.bangbang.member.domain.Member">
+		select * from
+		user where userid=#{userid}
+	</select>
+
+	<!-- Uidx 값으로 회원정보 가져오기 -->
+	<select id="selectByIdx"
+		resultType="com.bitwin.bangbang.member.domain.Member">
+		select * from
+		user where uidx=#{uidx}
+	</select>
+
+	<!-- 모든 회원 정보 가져오기 -->
+	<select id="selectAll"
+		resultType="com.bitwin.bangbang.member.domain.Member">
+		select * from
+		user
+	</select>
+
+	<!-- 회원 아이디 비밀번호 찾기 -->
+	<select id="searchId" resultType="String">
+		select userid from user where
+		email=#{email}
+	</select>
+	<select id="selectCountByEmailUserId" resultType="int">
+		select count(*)
+		from user where userid=#{userid} and email=#{email}
+	</select>
+
+	<!-- 회원 정보 수정 -->
+	<update id="editMember"
+		parameterType="com.bitwin.bangbang.member.domain.EditMember">
+		update user set email=#{email},
+		<if test="photo != null">photo=#{photoName},</if>
+		enotify=#{enotify}, mnotify=#{mnotify}, snotify=#{snotify} where
+		userid=#{userid}
+	</update>
+
+	<!-- 회원 비밀번호 수정 -->
+	<update id="updatePassword">
+		update user set password=#{newPassword} where
+		userid=#{userid}
+	</update>
+
+	<!-- 비밀번호 랜덤 변경 -->
+	<update id="updatePassword2">
+		update user set password=#{bpw}
+		where userid=#{userid}
+	</update>
+
+</mapper>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	
+<!-- 	<bean	id="dataSource"
+				class="com.zaxxer.hikari.HikariDataSource"
+				p:driverClassName="com.mysql.cj.jdbc.Driver"
+				p:jdbcUrl="jdbc:mysql://localhost:3306/bangbang?serverTimezone=UTC"
+				p:username="bitwin"
+				p:password="bitwin123123"
+	/> -->
+	
+		<bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource"
+		p:driverClassName="com.mysql.cj.jdbc.Driver"
+		p:jdbcUrl="jdbc:mysql://database-first-mysql.cwzzjjfxbmh2.ap-northeast-2.rds.amazonaws.com:3306/bangbang?serverTimezone=UTC"
+		p:username="admin" p:password="bitwin0906"
+		
+		p:connectionTimeout="20000"
+		p:minimumIdle="5"
+		p:maximumPoolSize="5"
+		p:validationTimeout="300000"
+		p:maxLifetime="1200000"
+		p:autoCommit="true" />
+
+	<!-- JdbcTemplate 등록 -->
+	<bean id="jdbcTemplate"
+			class="org.springframework.jdbc.core.JdbcTemplate"
+			p:dataSource-ref="dataSource"
+	/>
+
+	
+	<!-- SqlSessionFactory -->
+	<bean id="sqlSessionFactory"
+		class="org.mybatis.spring.SqlSessionFactoryBean"
+		p:dataSource-ref="dataSource"
+		p:mapperLocations="classpath:mybatis/mapper/*.xml"
+	/>
+	
+	<bean id="sqlSession" 
+		class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactory" />
+		
+	</bean>	
+	<!-- 김현우 추가 부분 -->
+	 <mybatis-spring:scan base-package="com.bitwin.mapper" />
+	<context:component-scan base-package="com.bitwin.service"></context:component-scan>
+	     <!-- 김현우 추가 부분  끝-->
+</beans>

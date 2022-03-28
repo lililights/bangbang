@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bitwin.bangbang.admin.dao.WishDAO">
+
+	<!-- 게시글 추천 여부 검색 -->
+	<select id="check" parameterType="map" resultType="int">
+		select count(*) from wishlist where iidx = #{iidx} and uidx = #{uidx}
+	</select>
+	
+	<!-- 게시글 추천 -->
+	<insert id="wishUpdate" parameterType="com.bitwin.bangbang.admin.dao.WishDAO">
+		insert into wishlist (iidx, uidx) values(#{iidx}, #{uidx})
+	</insert>
+	
+	<!-- 게시글 추천 취소 -->
+	<delete id="wishDelete" parameterType="map">
+		delete from wishlist where iidx = #{iidx} and uidx = #{uidx}
+	</delete>
+	
+	<!-- 게시글 추천수 -->
+	<select id="count" parameterType="int" resultType="int">
+		select count(*) from wishlist where iidx = #{iidx}
+	</select>
+	
+	<select id="getWishlist" resultType="com.bitwin.bangbang.admin.domain.Wishlist">
+		select * from wishlist where uidx = #{uidx}
+	</select>
+	
+</mapper>

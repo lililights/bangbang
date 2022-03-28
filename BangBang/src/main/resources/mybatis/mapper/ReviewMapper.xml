@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bitwin.bangbang.admin.dao.ReviewDAO">
+
+	<!-- 댓글 작성 -->
+	<insert id="create" parameterType="com.bitwin.bangbang.admin.domain.Review">
+		INSERT INTO review (uidx, iidx, content, rating)
+ 	 VALUES (#{uidx},#{iidx},#{content},#{rating})
+	</insert>
+	
+	<!-- 댓글 조회 -->
+	<select id="read" resultType="com.bitwin.bangbang.admin.domain.ReviewList">
+	
+	select r.ridx, r.uidx, r.iidx, r.content, r.rating, r.date, u.username
+	from review as r 
+	join user as u
+	on r.uidx = u.uidx
+	where iidx = #{iidx}
+	order by r.ridx desc
+	
+	</select>
+	
+	<!-- 댓글 수정 -->
+	<update id="update"
+			parameterType="com.bitwin.bangbang.admin.domain.Review">
+			
+			update review
+			set
+			content=#{content},
+			where ridx = #{ridx} and iidx = #{iidx}
+			
+	</update>
+	
+	<!-- 댓글 삭제 -->
+	<delete id="delete" parameterType="com.bitwin.bangbang.admin.domain.Review">
+		delete from review where uidx=#{uidx} and ridx = #{ridx}
+	</delete>
+	
+	<!-- 아이디 체크 -->
+		<select id="reviewUidCheck" resultType="int">
+ 			select uidx
+ 			from review
+      		where ridx = #{ridx}
+		</select>
+	
+	<select id="selectReview" resultType="com.bitwin.bangbang.admin.domain.Review">
+		SELECT *
+		FROM review
+		WHERE ridx = #{ridx}
+	</select>
+	
+</mapper>

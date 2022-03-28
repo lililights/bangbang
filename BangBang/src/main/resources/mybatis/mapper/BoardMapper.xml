@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bitwin.bangbang.admin.dao.BoardDAO">
+	<insert id="create" parameterType="com.bitwin.bangbang.admin.domain.BoardReg">
+			
+	 INSERT INTO sales_board (iidx, title, content, thumb, photo1, photo2)
+ 	 VALUES (#{iidx},#{title},#{content},#{thumbName},#{photo1Name},#{photo2Name})
+	</insert>
+	
+	<select id="selectTotalCount"
+			parameterType="hashMap"
+			resultType="int">
+									
+			select count(*) from sales_board
+			<where>
+				<if test="searchType != null"> 
+					<if test="searchType == 'title'">
+						<include refid="searchTitle"/>
+					</if>
+				</if>
+			</where>
+	</select>
+	
+	<sql id="searchTitle"> 
+		or title like CONCAT('%', #{keyword}, '%')
+	</sql>
+
+	<select id="selectList"
+			parameterType="com.bitwin.bangbang.admin.domain.SearchParams"
+			resultType="com.bitwin.bangbang.admin.domain.Board">
+	
+	select * from sales_board
+	
+	<where>
+		<if test="searchType != null">
+		
+			<if test="searchType == 'title'">
+				<include refid="searchTitle"/>
+			</if>
+		</if>
+	</where>
+	
+	 order by iidx desc limit #{index}, #{count}
+	
+	</select>
+	
+	<select id="read" resultType="com.bitwin.bangbang.admin.domain.Board">
+		select * from sales_board where iidx = #{iidx}
+	</select>
+	
+	<update id="hits">
+		update sales_board set hits = hits + 1 where iidx = #{iidx}
+	</update>
+	
+	<update id="update"
+			parameterType="com.bitwin.bangbang.admin.domain.BoardEdit">
+	
+		update sales_board
+		set 
+		title=#{title},
+		content=#{content}
+		<if test="thumbName != null">
+		, thumb=#{thumbName}		
+		</if> 
+		<if test="photo1Name != null">
+		, photo1=#{photo1Name}		
+		</if> 
+		<if test="photo2Name != null">
+		, photo2=#{photo2Name}		
+		</if> 
+		where iidx=#{iidx}
+	
+	</update>
+	
+	<delete id="delete">
+		delete from sales_board where iidx=#{iidx}
+	</delete>
+	
+	<select id="selectCount"
+			parameterType="hashMap"
+			resultType="int">
+									
+			select count(*) from sales_board where iidx in (select iidx from item where type=#{keyword})
+	</select>
+	
+	<select id="selectTypeList"
+			parameterType="com.bitwin.bangbang.admin.domain.SearchParams"
+			resultType="com.bitwin.bangbang.admin.domain.Board">
+	
+	select * from sales_board where iidx in (select iidx from item where type=#{keyword})
+	
+	 order by iidx desc limit #{index}, #{count}
+	
+	</select>
+	
+</mapper>
