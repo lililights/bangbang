@@ -6,6 +6,7 @@
 
 <mapper namespace="com.bitwin.bangbang.order.dao.OrderDao">
 
+	<!-- 장바구니 목록에 출력할 상품 정보 -->
 	<select id="getItemInfo"
 		parameterType="com.bitwin.bangbang.order.domain.CartItem"
 		resultType="com.bitwin.bangbang.order.domain.OrderItemInfo">
@@ -15,6 +16,7 @@
 		where i.iidx=#{iidx}
 	</select>
 
+	<!-- 주문서에 출력할 회원정보 -->
 	<select id="getOrderReqMemberInfo"
 		resultType="com.bitwin.bangbang.order.domain.OrderReqMemberInfo">
 		select uidx, username, phonenum
@@ -22,6 +24,7 @@
 		where uidx=#{uidx}
 	</select>
 
+	<!-- 사용가능 적립금 조회 -->
 	<select id="getMemberPoint"
 		resultType="com.bitwin.bangbang.order.domain.MemberPoint">
 		select count(poidx) as count, balance as point 
@@ -32,12 +35,14 @@
 			where uidx=#{uidx})
 	</select>
 
+	<!-- 회원의 주문 이력 조회 -->
 	<select id="getOrderCnt" resultType="int">
 		select count(oidx) 
 		from bangbang.order 
 		where uidx=#{uidx};
 	</select>
 
+	<!-- 주문서에 출력할 회원의 최근 이용 가맹점 -->
 	<select id="getRecentStore" resultType="int">
 		select sidx 
 		from bangbang.order 
@@ -48,6 +53,7 @@
 			where uidx=#{uidx});
 	</select>
 
+	<!-- 주문서에 출력할 가맹점 정보 -->
 	<select id="getStoreInfo"
 		resultType="com.bitwin.bangbang.order.domain.OrderReqStoreInfo">
 		select sidx, sname, sphone, address 
@@ -55,6 +61,7 @@
 		where sidx=#{sidx}
 	</select>
 
+	<!-- 주문 DB insert -->
 	<insert id="insertOrder"
 		parameterType="com.bitwin.bangbang.order.domain.OrderRequest"
 		useGeneratedKeys="true" keyProperty="oidx">
@@ -69,6 +76,7 @@
 		</if>
 	</insert>
 
+	<!-- 주문 상품 DB insert -->
 	<insert id="insertOrderItems"
 		parameterType="com.bitwin.bangbang.order.domain.OrderItem">
 		insert into bangbang.order_item
@@ -79,6 +87,7 @@
 		</foreach>
 	</insert>
 
+	<!-- 결제 정보 DB insert -->
 	<insert id="insertPayment"
 		parameterType="com.bitwin.bangbang.order.domain.PaymentInfo">
 		insert into bangbang.payment
@@ -87,6 +96,7 @@
 		(#{oidx}, #{totalprice}, #{discount}, #{pointused}, #{totalpay}, #{method})
 	</insert>
 
+	<!-- 회원용 주문 목록 출력 -->
 	<select id="selectOrderListMember"
 		parameterType="com.bitwin.bangbang.order.domain.OrderListOptMember"
 		resultType="com.bitwin.bangbang.order.domain.OrderListMember">
@@ -119,6 +129,7 @@
 		order by date desc
 	</select>
 
+	<!-- 가맹점용 주문 목록 출력 -->
 	<select id="selectOrderListStore"
 		parameterType="com.bitwin.bangbang.order.domain.OrderListOptStore"
 		resultType="com.bitwin.bangbang.order.domain.OrderListStore">
@@ -152,6 +163,7 @@
 		order by date desc
 	</select>
 
+	<!-- 관리자용 주문 목록 출력 -->
 	<select id="selectOrderListAdmin"
 		parameterType="com.bitwin.bangbang.order.domain.OrderListOptAdmin"
 		resultType="com.bitwin.bangbang.order.domain.OrderListAdmin">
@@ -180,6 +192,7 @@
 		order by date desc
 	</select>
 
+	<!-- 구매 제품 리스트 -->
 	<select id="selectOrderItemInfo"
 		resultType="com.bitwin.bangbang.order.domain.OrderItemInfo">
 		select oi.iidx, sb.thumb, i.name, oi.qty, (i.sprice * oi.qty) as price, 
@@ -192,6 +205,7 @@
 		where oi.oidx=#{oidx}
 	</select>
 
+	<!-- 일반회원 권한으로 요청한 주문 상세보기 -->
 	<select id="selectOrderInfoMember"
 		resultType="com.bitwin.bangbang.order.domain.OrderInfoMember">
 		select o.oidx, o.date, o.status, s.sname, o.name, o.phone, o.msg, p.totalPrice, p.discount, p.pointUsed, p.totalPay
@@ -203,6 +217,7 @@
 		where o.oidx=#{oidx}
 	</select>
 
+	<!-- 가맹점 권한으로 요청한 주문 상세보기 -->
 	<select id="selectOrderInfoStore"
 		resultType="com.bitwin.bangbang.order.domain.OrderInfoStore">
 		select o.oidx, o.date, o.status, o.name, o.msg, truncate(p.totalPrice * 0.1, 0) as commission
@@ -212,6 +227,7 @@
 		where o.oidx=#{oidx}
 	</select>
 
+	<!-- 관리자 권한으로 요청한 주문 상세보기 -->
 	<select id="selectOrderInfoAdmin"
 		resultType="com.bitwin.bangbang.order.domain.OrderInfoAdmin">
 		select o.oidx, o.date, o.status, u.uidx, u.userid, s.sname, o.name, o.phone, o.msg, 
@@ -226,6 +242,7 @@
 		where o.oidx=#{oidx}
 	</select>
 
+	<!-- 관리자용 택배/퀵 배송관리 리스트 -->
 	<select id="selectDeliveryList"
 		resultType="com.bitwin.bangbang.order.domain.DeliveryList">
 		select didx, oidx, service, provider, no, fee 
@@ -234,6 +251,7 @@
 		where status not in('픽업완료', '반품완료')
 	</select>
 	
+	<!-- 주문 번호로 택배/퀵 배송 조회 -->
 	<select id="deliveryTracking" resultType="String">
 		select d.no 
 		from bangbang.delivery d
@@ -242,6 +260,7 @@
 		where d.oidx=#{oidx}
 	</select>
 
+	<!-- 주문 단계 변경 -->
 	<update id="updateStatus"
 		parameterType="com.bitwin.bangbang.order.domain.UpdateStatus">
 		update bangbang.order 
@@ -249,6 +268,7 @@
 		where oidx=#{oidx}
 	</update>
 
+	<!-- 주문 정보 변경 -->
 	<update id="updateOrder"
 		parameterType="com.bitwin.bangbang.order.domain.UpdateOrder">
 		update bangbang.order 
@@ -256,6 +276,7 @@
 		where oidx=#{oidx}
 	</update>
 
+	<!-- 관리자용 택배/퀵 배송 요청 -->
 	<insert id="deliveryRequest"
 		parameterType="com.bitwin.bangbang.order.domain.DeliveryRequest">
 		insert into bangbang.delivery
