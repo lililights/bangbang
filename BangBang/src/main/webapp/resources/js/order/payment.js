@@ -1,4 +1,4 @@
-// 아임포트 결제 API
+// 아임포트 결제 API//
 function iamportPayment(contextPath) {
   let IMP = window.IMP;
   IMP.init("imp03857707");

@@ -1,4 +1,4 @@
-package com.bitwin.bangbang.order.domain;
+package com.bitwin.bangbang.order.domain;//
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

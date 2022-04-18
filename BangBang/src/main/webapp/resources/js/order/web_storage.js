@@ -1,4 +1,4 @@
-// 자바스크립트의 다형성을 이용한 로컬스토리지 프로토타입
+// 자바스크립트의 다형성을 이용한 로컬스토리지 프로토타입//
 function local(key) {}
 
 local.prototype.getItem = function (key) {

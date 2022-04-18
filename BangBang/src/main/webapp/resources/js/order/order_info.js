@@ -1,4 +1,4 @@
-// 주문 단계 변경
+// 주문 단계 변경//
 function updateStatus(oidx, status) {
   let update = {
     oidx: oidx,
