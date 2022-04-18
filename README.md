@@ -1,5 +1,7 @@
 # 방방술래
 
+ 
+
 ### \[비트캠프 214기 final 통합개발 프로젝트\]
 - **팀명:** 비트윈 (BIT-WIN)
 - **프로젝트명:** 방방술래 (전국 방방곡곡 원하는 술이 찾아옵니다.)
@@ -9,8 +11,8 @@
 - **개발스택:**<br />**\[BACK\]** JAVA, Spring Framework, MyBatis<br />**\[FRONT\]** Javascript, JSP, HTML5, CCS3, jQuery, JSON, Ajax, Bootstrap<br />**\[DB\]** MySQL, Exerd
 - **개발환경:** Eclipse, STS, Tomcat 8.5, Maven, Visual Studio Code
 
-* * *
-
+ 
+ 
 ### \[주요일정\]
 |날짜|내용|
 |:---:|:---|
