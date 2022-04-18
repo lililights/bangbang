@@ -1,4 +1,4 @@
-package com.bitwin.bangbang.order.service;//
+package com.bitwin.bangbang.order.service;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;

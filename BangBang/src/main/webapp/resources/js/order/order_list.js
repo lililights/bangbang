@@ -1,4 +1,4 @@
-// 옵션값 <select> 에 출력할 기간 설정//
+// 옵션값 <select> 에 출력할 기간 설정
 function setPeriodOption(date) {
   let year = date.getFullYear();
   let month = date.getMonth();

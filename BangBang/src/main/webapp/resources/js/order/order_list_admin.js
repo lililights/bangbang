@@ -1,4 +1,4 @@
-// 관리자용 주문목록 출력//
+// 관리자용 주문목록 출력
 function printList(data, contextPath) {
   let html = "";
 

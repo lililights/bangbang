@@ -1,4 +1,4 @@
-// 저장된 장바구니 목록 불러오기 (로컬스토리지/세션스토리지)//
+// 저장된 장바구니 목록 불러오기 (로컬스토리지/세션스토리지)
 function getCartItemInfo(contextPath) {
   $.ajax({
     url: contextPath + "/cart",
