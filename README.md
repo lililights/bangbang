@@ -7,7 +7,7 @@
 - **개요:** 일반 소비자들이 온라인 주류 쇼핑 후 인근 식당에서 픽업을 할 수 있는 서비스를 제공하는 플랫폼
 - **벤치마킹:** 데일리샷, 달리, 와프너
 - **개발스택:**<br />**\[BACK\]** JAVA, Spring Framework, MyBatis<br />**\[FRONT\]** Javascript, JSP, HTML5, CCS3, jQuery, Ajax, Bootstrap<br />**\[DB\]** MySQL
-- **개발환경:** Eclipse, STS, Tomcat 8.5, Maven, Visual Studio Code, Exerd
+- **개발환경:** Eclipse, STS, Tomcat 8.5, Maven, Visual Studio Code, MySQL Workbench, eXERD
 
 ### / 주요일정 /
 |날짜|내용|
